@@ -1,0 +1,65 @@
+---
+- hosts: default
+  become: yes
+  become_user: root
+  vars:
+    mysql_user: trpgpg
+    mysql_password: passWord1!
+    mysql_database: trpgpg
+    elixir_repo: https://github.com/elixir-lang/elixir.git
+    elixir_dir: /home/vagrant/elixir
+    phoenix_archive: https://github.com/phoenixframework/archives/raw/master/phoenix_new.ez
+    nvm_repo: https://github.com/creationix/nvm.git
+    nvm_dir: /home/vagrant/nvm
+  tasks:
+    - name: apt-get update & upgrade
+      apt: update_cache=true upgrade=dist
+    - name: install MySQL packages
+      apt: name={{ item }} state=installed
+      with_items:
+        - mysql-server
+        - mysql-client
+        - libmysqld-dev
+        - libmysqlclient-dev
+        - python-mysqldb
+        - erlang
+        - build-essential
+    - name: create mysql database
+      mysql_db: name={{ mysql_database }} state=present
+    - name: create mysql user
+      mysql_user: name={{ mysql_user }} host={{ item }} password={{ mysql_password }} priv={{ mysql_database }}.*:ALL,GRANT state=present
+      with_items:
+        - localhost
+        - 192.168.33.%
+    - name: uncomment a line bind-address = 127.0.0.1
+      replace: >
+        dest=/etc/mysql/mysql.conf.d/mysqld.cnf
+        regexp='^bind-address'
+        replace='#bind-address'
+    - name: start mysql
+      service: name=mysql state=restarted enabled=yes
+    - name: git clone elixir
+      git: repo={{ elixir_repo }} dest={{ elixir_dir }} version=master accept_hostkey=yes
+    - name: make install elixir
+      make: chdir={{ elixir_dir }} target=install
+    - name: mix local.hex
+      command: mix local.hex --force
+    - name: phoenix archive install
+      command: mix archive.install {{ phoenix_archive }}
+    - name: Install nvm
+      become: yes
+      become_user: vagrant
+      git: repo={{ nvm_repo }} dest={{ nvm_dir }} version=master 
+    - name: run nvm install script
+      become: yes
+      become_user: vagrant
+      shell: "{{ nvm_dir }}/install.sh"
+    - name: nvm install stable
+      become: yes
+      become_user: vagrant
+      shell: /bin/bash -c "source ~/.nvm/nvm.sh && nvm install stable"
+
+    - name: nvm use stable
+      become: yes
+      become_user: vagrant
+      shell: /bin/bash -c "source ~/.nvm/nvm.sh && nvm use stable"
