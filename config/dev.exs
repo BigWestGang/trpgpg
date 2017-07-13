@@ -34,16 +34,5 @@ config :logger, :console, format: "[$level] $message\n"
 # in production as building large stacktraces may be expensive.
 config :phoenix, :stacktrace_depth, 20
 
-# Configure your database
-config :trpg, Trpg.Repo,
-  adapter: Ecto.Adapters.MySQL,
-  username: "trpgpg",
-  password: "passWord1!",
-  database: "trpgpg",
-  hostname: "192.168.33.10",
-  pool_size: 10
-
-config :extwitter, :oauth, [
-   consumer_key: "C2fbLVPnIGUZHrsQPbEVM5FLX",
-   consumer_secret: "UOoPfC0AQBMwXyO8MTbqFKFpJeV2l2KIj4A4ETpk8tXIuhG4Lw"
-]
+# SECRET_SETTINGS
+import_config "dev.secret.exs"
