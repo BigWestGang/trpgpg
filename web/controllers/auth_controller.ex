@@ -16,10 +16,9 @@ defmodule Trpg.AuthController do
             result = save(user_params)
         end
       {:error, reason} ->
-        result =
-          case {:error, reason} do
-            reason -> :id
-          end
+        result = case {:error, reason} do
+          reason -> :id
+        end
     end
 
     conn
