@@ -8,22 +8,20 @@ defmodule Trpg.AuthController do
   end
 
   def callback(conn, %{"oauth_token" => token, "oauth_verifier" => verifier}) do
-    case Twitter.get_access_token(verifier, token) do
+    result = case Twitter.get_access_token(verifier, token) do
       {:ok, access_token} ->
         case Twitter.get_user(access_token.user_id, access_token.screen_name) do
           user_info ->
             user_params = createParams(user_info)
-            result = save(user_params)
+            save(user_params)
         end
       {:error, reason} ->
-        result =
           case {:error, reason} do
             reason -> :id
           end
     end
-
     conn
-      |> put_session(:id, result.id)
+      |> put_session(:id, result)
       |> redirect(to: "/")
   end
 
