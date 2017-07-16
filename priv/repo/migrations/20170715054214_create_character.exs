@@ -4,12 +4,15 @@ defmodule Trpg.Repo.Migrations.CreateCharacter do
   def change do
     create table(:characters) do
       add :name, :string
-      add :avator, :string
+      add :avator_id, :bigint
       add :user_id, :bigint
-      add :race_id, :int
-      add :job_id, :int
+      add :sex, :string
+      add :race_id, :bigint
+      add :job_id, :bigint
+      add :sub_job_id, :bigint
+      add :tags_id, :bigint
       add :description, :text
-
+      add :guidingcreed_id, :bigint
       timestamps()
     end
   end

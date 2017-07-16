@@ -3,7 +3,7 @@ defmodule Trpg.User do
 
   schema "users" do
     field :name, :string
-    field :twitter_id, :integer
+    field :twitter_id, :bigint
     field :avator, :string
 
     timestamps()
